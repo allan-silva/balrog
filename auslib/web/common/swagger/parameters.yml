@@ -7,6 +7,14 @@ parameters:
     x-nullable: true
     required: false
 
+  channelQueryParam:
+    name: channel
+    in: query
+    description: Name of the channel to filter.
+    type: string
+    x-nullable: true
+    required: false
+
   releaseParam:
     name: release
     in: path
@@ -69,3 +77,9 @@ parameters:
     type: integer
     minimum: 0
     required: true
+
+  shutoff_id:
+    name: shutoff_id
+    in: path
+    required: true
+    type: integer
