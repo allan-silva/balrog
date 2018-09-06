@@ -237,7 +237,7 @@ definitions:
         description: >
           The version requirements that the client must meet in order for the rule to match. Exact matches, comma separated lists (eg: "36.0,36.0.1") and comparisons (eg: "<45.0") are allowed.
         type: ["string", "null"]
-        format: version
+        format: mozillaAllVersions
         minLength: 0
         maxLength: 75
         example: '36.0'

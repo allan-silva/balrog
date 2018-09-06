@@ -5,7 +5,7 @@ import logging
 import operator
 
 from auslib.util.comparison import get_op, strip_operator
-from auslib.util.versions import MozillaVersion
+from auslib.util.versions import MozillaVersion, PostModernMozillaVersion, ModernMozillaVersion, AncientMozillaVersion
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +59,47 @@ def version_validator(field_value):
         if not hasattr(version, 'version'):
             raise jsonschema.ValidationError("Couldn't parse the version for %s. No attribute 'version' was detected."
                                              % field_value)
+    return True
+
+
+@jsonschema.draft4_format_checker.checks(format="mozillaAllVersions", raises=jsonschema.ValidationError)
+def mozilla_all_versions(field_value):
+    logger.debug('starting in version_validator: version data is %s' % field_value)
+    if not isinstance(field_value, str_types):
+        return True
+    # empty input is fine
+    if field_value is None or field_value == '':
+        return True
+    rules_version_list = field_value.split(",")
+    is_list_of_versions = len(rules_version_list) > 1
+    for rule_version in rules_version_list:
+        try:
+            op, operand = get_op(rule_version)
+            if is_list_of_versions and op != operator.eq:
+                raise jsonschema.ValidationError('Invalid input for %s .Relational Operators are not allowed'
+                                                 ' when providing a list of versions.' % field_value)
+            try:
+                version = PostModernMozillaVersion(operand)
+                continue
+            except ValueError:
+                pass
+            try:
+                version = ModernMozillaVersion(operand)
+                continue
+            except ValueError:
+                pass
+            version = AncientMozillaVersion(operand)
+        except jsonschema.ValidationError:
+            raise
+        except ValueError:
+            raise jsonschema.ValidationError("ValueError. Couldn't parse version for %s. Invalid '%s' input value"
+                                             % (field_value, field_value))
+        except Exception:
+            raise jsonschema.ValidationError('Invalid input for %s . No Operator or Match found.' % field_value)
+    # MozillaVersion doesn't error on empty strings
+    if not hasattr(version, 'version'):
+        raise jsonschema.ValidationError("Couldn't parse the version for %s. No attribute 'version' was detected."
+                                         % field_value)
     return True
 
 
