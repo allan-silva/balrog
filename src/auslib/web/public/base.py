@@ -9,6 +9,7 @@ from sentry_sdk import capture_exception
 from specsynthase.specbuilder import SpecBuilder
 
 import auslib.web
+import auslib.web.public.middlewares as middlewares
 from auslib.errors import BadDataError
 from auslib.web.admin.views.problem import problem
 
@@ -22,6 +23,8 @@ log = logging.getLogger(__name__)
 
 connexion_app = connexion.App(__name__, specification_dir=".", options={"swagger_ui": False})
 app = connexion_app.app
+
+middlewares.configure_bigquery_log(app)
 
 current_dir = path.dirname(__file__)
 web_dir = path.dirname(auslib.web.__file__)

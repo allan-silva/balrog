@@ -88,6 +88,7 @@ services:
       - PORT=9010
       - LOG_FORMAT=plain
       - LOG_LEVEL=WARNING
+      - ENABLE_UPDATE_BIGQUERY_LOG=1
     links:
       - balrogdb
 
